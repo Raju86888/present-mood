@@ -2,11 +2,6 @@ import numpy as np
 import cv2
 import datetime
 
-
-import tkinter as tk
-from tkinter import *
-from PIL import Image, ImageTk
-
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.layers import Conv2D
@@ -14,10 +9,9 @@ from tensorflow.keras.layers import MaxPooling2D
 
 from timeit import default_timer as timer
 
-
 emotion_model = Sequential()
 
-emotion_model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48,48,1)))
+emotion_model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48, 48, 1)))
 emotion_model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
 emotion_model.add(MaxPooling2D(pool_size=(2, 2)))
 emotion_model.add(Dropout(0.25))
@@ -36,13 +30,10 @@ emotion_model.load_weights('emotion_model_gpu_50.h5')
 
 cv2.ocl.setUseOpenCL(False)
 
-emotion_dict = {0: "   Angry   ", 1: "Disgusted", 2: "  Fearful  ", 3: "   Happy   ", 4: "  Neutral  ", 5: "    Sad    ", 6: "Surprised"}
-
-
-emoji_dist={0:"emojis/angry.png",2:"emojis/disgusted.png",2:"emojis/fearful.png",3:"emojis/happy.png",4:"emojis/neutral.png",5:"emojis/sad.png",6:"emojis/surprised.png"}
-
-
-
+emotion_dict = {0: "   Angry   ", 1: "Disgusted", 2: "  Fearful  ", 3: "   Happy   ", 4: "  Neutral  ",
+                5: "    Sad    ", 6: "Surprised"}
+emoji_dist = {0: "emojis/angry.png", 2: "emojis/disgusted.png", 2: "emojis/fearful.png", 3: "emojis/happy.png",
+              4: "emojis/neutral.png", 5: "emojis/sad.png", 6: "emojis/surprised.png"}
 
 
 def main():
@@ -66,11 +57,11 @@ def main():
     frames = 0
 
     # main loop: retrieves and displays a frame from the camera
-    while (True):
+    while True:
         start = timer()
         # blocks until the entire frame is read
         success, img = cap.read()
-        print("capture time"+str(start - timer()))
+        print("capture time" + str(start - timer()))
         img = cv2.resize(img, (600, 500))
         bounding_box = cv2.CascadeClassifier('venv/lib/site-packages/cv2/data/haarcascade_frontalface_default.xml')
         gray_frame = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -85,22 +76,21 @@ def main():
             prediction = emotion_model.predict(cropped_img)
             print("detection time" + str(start - timer()))
             maxindex = int(np.argmax(prediction))
-            expressionName = emotion_dict[maxindex]
 
-            expressionImage = cv2.imread(emoji_dist[maxindex], -1)
+            expression_image = cv2.imread(emoji_dist[maxindex], -1)
             x_offset = x
             y_offset = 0 if (y - 75) < 0 else (y - 75)
-            y1, y2 = y_offset, y_offset + expressionImage.shape[0]
-            x1, x2 = x_offset, x_offset + expressionImage.shape[1]
+            y1, y2 = y_offset, y_offset + expression_image.shape[0]
+            x1, x2 = x_offset, x_offset + expression_image.shape[1]
 
-            alpha_s = expressionImage[:, :, 3] / 255.0
+            alpha_s = expression_image[:, :, 3] / 255.0
             alpha_l = 1.0 - alpha_s
 
             for c in range(0, 3):
-                img[y1:y2, x1:x2, c] = (alpha_s * expressionImage[:, :, c] + alpha_l * img[y1:y2, x1:x2, c])
+                img[y1:y2, x1:x2, c] = (alpha_s * expression_image[:, :, c] + alpha_l * img[y1:y2, x1:x2, c])
 
-            cv2.putText(img, expressionName, (x, y - 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
-
+            expression_name = emotion_dict[maxindex]
+            cv2.putText(img, expression_name, (x, y - 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
 
         frames += 1
 
@@ -115,7 +105,7 @@ def main():
 
         # wait 1ms for ESC to be pressed
         key = cv2.waitKey(1)
-        if (key == 27):
+        if key == 27:
             break
 
     # release resources
