@@ -86,7 +86,19 @@ def main():
             print("detection time" + str(start - timer()))
             maxindex = int(np.argmax(prediction))
             expressionName = emotion_dict[maxindex]
-            print(expressionName)
+
+            expressionImage = cv2.imread(emoji_dist[maxindex], -1)
+            x_offset = x
+            y_offset = 0 if (y - 75) < 0 else (y - 75)
+            y1, y2 = y_offset, y_offset + expressionImage.shape[0]
+            x1, x2 = x_offset, x_offset + expressionImage.shape[1]
+
+            alpha_s = expressionImage[:, :, 3] / 255.0
+            alpha_l = 1.0 - alpha_s
+
+            for c in range(0, 3):
+                img[y1:y2, x1:x2, c] = (alpha_s * expressionImage[:, :, c] + alpha_l * img[y1:y2, x1:x2, c])
+
             cv2.putText(img, expressionName, (x, y - 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
 
 
