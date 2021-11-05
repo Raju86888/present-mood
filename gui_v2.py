@@ -30,8 +30,8 @@ emotion_model.load_weights('emotion_model_gpu_50.h5')
 
 cv2.ocl.setUseOpenCL(False)
 
-emotion_dict = {0: "   Angry   ", 1: "Disgusted", 2: "  Fearful  ", 3: "   Happy   ", 4: "  Neutral  ",
-                5: "    Sad    ", 6: "Surprised"}
+emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral",
+                5: "Sad", 6: "Surprised"}
 emoji_dist = {0: "emojis/angry.png", 2: "emojis/disgusted.png", 2: "emojis/fearful.png", 3: "emojis/happy.png",
               4: "emojis/neutral.png", 5: "emojis/sad.png", 6: "emojis/surprised.png"}
 
@@ -90,7 +90,7 @@ def main():
                 img[y1:y2, x1:x2, c] = (alpha_s * expression_image[:, :, c] + alpha_l * img[y1:y2, x1:x2, c])
 
             expression_name = emotion_dict[maxindex]
-            cv2.putText(img, expression_name, (x, y - 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+            cv2.putText(img, expression_name, (x2 + 5, y - 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
 
         frames += 1
 
